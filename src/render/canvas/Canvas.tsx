@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { updateSimulation } from '../../core/simulation/engine';
+import {
+  setupSimulation,
+  updateSimulation,
+} from '../../core/simulation/engine';
 import { world } from '../../state/world';
 
 export function Canvas() {
@@ -21,6 +24,8 @@ export function Canvas() {
     window.addEventListener('resize', resize);
 
     let frame: number;
+
+    setupSimulation(canvas.height, canvas.width);
 
     const loop = () => {
       updateSimulation();
