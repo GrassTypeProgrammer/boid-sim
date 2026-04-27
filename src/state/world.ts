@@ -2,10 +2,8 @@ import type { Bounds, World } from '../core/simulation/types';
 
 export const world: World = {
   bounds: {
-    minX: 0,
-    minY: 0,
-    maxX: 0,
-    maxY: 0,
+    min: { x: 0, y: 0 },
+    max: { x: 0, y: 0 },
     width: 0,
     height: 0,
   } as Bounds,

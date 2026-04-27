@@ -11,10 +11,8 @@ export type Boid = {
 };
 
 export type Bounds = {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
+  min: Vector;
+  max: Vector;
   width: number;
   height: number;
 };

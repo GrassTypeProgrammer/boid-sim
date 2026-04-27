@@ -2,7 +2,7 @@ import { world } from '../../state/world';
 import type { Boid, Vector } from './types';
 
 // TODO: Get in a better way.
-const MIN_DISTANCE: number = 50;
+const MIN_DISTANCE: number = 150;
 
 // TODO: have a restulf faux api to edit the bounds
 export function setupSimulation(
@@ -11,12 +11,10 @@ export function setupSimulation(
   minX: number = 0,
   minY: number = 0,
 ) {
-  world.bounds.minX = minX;
-  world.bounds.minY = minY;
+  world.bounds.min = { x: 0, y: 0 };
   world.bounds.height = height;
   world.bounds.width = width;
-  world.bounds.maxX = minX + width;
-  world.bounds.maxY = minY + height;
+  world.bounds.max = { x: minX + width, y: minY + height };
 
   if (world.boids.length === 0) {
     // TODO: Set these up better
@@ -33,9 +31,18 @@ export function setupSimulation(
 
 export function updateSimulation(deltaTime: number) {
   for (const boid of world.boids) {
-    borderAvoidance(boid);
-    separation(boid);
-    boid.velocity = scalarMultiplication(
+    let steering: Vector = { x: boid.direction.x, y: boid.direction.y };
+    steering = vectorAddition(steering, borderAvoidance(boid));
+    steering = vectorAddition(steering, separation(boid));
+
+    // Add all directions up and normalise once at the end, so all have equal weighting
+    if (vectorMagnitude(steering) > 0) {
+      boid.direction = normaliseVector(
+        vectorAddition(boid.direction, steering),
+      );
+    }
+
+    boid.direction = boid.velocity = scalarMultiplication(
       boid.direction,
       boid.speed * deltaTime,
     );
@@ -49,7 +56,7 @@ function cohesion(boid: Boid) {
   return boid;
 }
 
-function separation(boid: Boid) {
+function separation(boid: Boid): Vector {
   // for the given boid, loop through the others to find the neighbours (if within x radius).
   // if closer than min distance, move away using a - b.
   let steering: Vector = { x: 0, y: 0 };
@@ -71,9 +78,7 @@ function separation(boid: Boid) {
     }
   }
 
-  if (vectorMagnitude(steering) > 0) {
-    boid.direction = normaliseVector(vectorAddition(boid.direction, steering));
-  }
+  return steering;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,28 +86,37 @@ function alignment(boid: Boid) {
   return boid;
 }
 
-function borderAvoidance(boid: Boid) {
+function borderAvoidance(boid: Boid): Vector {
   // Improvement: Do the calculations before the pass the borders rather than after they pass them.
+  let steering: Vector = { x: 0, y: 0 };
+
   const bounds = world.bounds;
-  let dirX: number = 0;
-  let dirY: number = 0;
+  let distanceX: number = 1;
+  const distanceY: number = 1;
 
-  if (boid.position.x < bounds.minX) {
-    dirX = bounds.minX - boid.position.x;
-  } else if (boid.position.x > bounds.maxX) {
-    dirX = bounds.maxX - boid.position.x;
+  if (boid.position.x < bounds.min.x) {
+    steering.x = bounds.min.x - boid.position.x;
+    distanceX = boid.position.x - bounds.min.x;
+  } else if (boid.position.x > bounds.max.x) {
+    steering.x = bounds.max.x - boid.position.x;
+    distanceX = boid.position.x - bounds.max.x;
   }
 
-  if (boid.position.y < bounds.minY) {
-    dirY = bounds.minY - boid.position.y;
-  } else if (boid.position.y > bounds.maxY) {
-    dirY = bounds.maxY - boid.position.y;
+  if (boid.position.y < bounds.min.y) {
+    steering.y = bounds.min.y - boid.position.y;
+    distanceX = boid.position.y - bounds.min.y;
+  } else if (boid.position.y > bounds.max.y) {
+    steering.y = bounds.max.y - boid.position.y;
+    distanceX = boid.position.y - bounds.max.y;
   }
 
-  const dirNormalised = normaliseVector({ x: dirX, y: dirY });
-  boid.direction = normaliseVector(
-    vectorAddition(boid.direction, dirNormalised),
-  );
+  const weight = 1 / ((distanceX + distanceY) / 2);
+  steering = normaliseVector(scalarMultiplication(steering, weight));
+
+  return steering;
+  // boid.direction = normaliseVector(
+  //   vectorAddition(boid.direction, dirNormalised),
+  // );
 }
 
 function normaliseVector(vector: Vector): Vector {
