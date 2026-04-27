@@ -1,4 +1,4 @@
-import type { Boid, Bounds, World } from '../core/simulation/types';
+import type { Bounds, World } from '../core/simulation/types';
 
 export const world: World = {
   bounds: {
@@ -9,12 +9,5 @@ export const world: World = {
     width: 0,
     height: 0,
   } as Bounds,
-  boids: [
-    {
-      x: 100,
-      y: 100,
-      xv: 2,
-      yv: 1,
-    } satisfies Boid,
-  ],
+  boids: [],
 };

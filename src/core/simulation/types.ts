@@ -4,10 +4,10 @@ export type World = {
 };
 
 export type Boid = {
-  x: number;
-  y: number;
-  xv: number;
-  yv: number;
+  position: Vector;
+  velocity: Vector;
+  direction: Vector;
+  speed: number;
 };
 
 export type Bounds = {
@@ -17,4 +17,9 @@ export type Bounds = {
   maxY: number;
   width: number;
   height: number;
+};
+
+export type Vector = {
+  x: number;
+  y: number;
 };

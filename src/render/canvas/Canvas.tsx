@@ -39,7 +39,7 @@ export function Canvas() {
 
       for (const boid of world.boids) {
         ctx.beginPath();
-        ctx.arc(boid.x, boid.y, 5, 0, Math.PI * 2);
+        ctx.arc(boid.position.x, boid.position.y, 5, 0, Math.PI * 2);
         ctx.fill();
       }
 
