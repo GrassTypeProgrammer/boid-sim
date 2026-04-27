@@ -2,7 +2,7 @@ import { world } from '../../state/world';
 import type { Boid, Vector } from './types';
 
 // TODO: Get in a better way.
-const MIN_DISTANCE: number = 150;
+const MIN_DISTANCE: number = 50;
 
 // TODO: have a restulf faux api to edit the bounds
 export function setupSimulation(
@@ -22,7 +22,7 @@ export function setupSimulation(
       world.boids.push({
         position: { x: 100, y: 100 },
         velocity: { x: 0, y: 0 },
-        direction: { x: 2 + index * 100, y: 1 },
+        direction: { x: 2 + index * 10, y: 1 },
         speed: 100,
       });
     }
@@ -87,36 +87,36 @@ function alignment(boid: Boid) {
 }
 
 function borderAvoidance(boid: Boid): Vector {
-  // Improvement: Do the calculations before the pass the borders rather than after they pass them.
-  let steering: Vector = { x: 0, y: 0 };
-
   const bounds = world.bounds;
-  let distanceX: number = 1;
-  const distanceY: number = 1;
+  const MARGIN = 50;
 
-  if (boid.position.x < bounds.min.x) {
-    steering.x = bounds.min.x - boid.position.x;
-    distanceX = boid.position.x - bounds.min.x;
-  } else if (boid.position.x > bounds.max.x) {
-    steering.x = bounds.max.x - boid.position.x;
-    distanceX = boid.position.x - bounds.max.x;
+  const steering = { x: 0, y: 0 };
+
+  // Left wall
+  if (boid.position.x < bounds.min.x + MARGIN) {
+    const distance = bounds.min.x + MARGIN - boid.position.x;
+    steering.x += distance / MARGIN;
   }
 
-  if (boid.position.y < bounds.min.y) {
-    steering.y = bounds.min.y - boid.position.y;
-    distanceX = boid.position.y - bounds.min.y;
-  } else if (boid.position.y > bounds.max.y) {
-    steering.y = bounds.max.y - boid.position.y;
-    distanceX = boid.position.y - bounds.max.y;
+  // Right wall
+  if (boid.position.x > bounds.max.x - MARGIN) {
+    const distance = boid.position.x - (bounds.max.x - MARGIN);
+    steering.x -= distance / MARGIN;
   }
 
-  const weight = 1 / ((distanceX + distanceY) / 2);
-  steering = normaliseVector(scalarMultiplication(steering, weight));
+  // Top wall
+  if (boid.position.y < bounds.min.y + MARGIN) {
+    const distance = bounds.min.y + MARGIN - boid.position.y;
+    steering.y += distance / MARGIN;
+  }
+
+  // Bottom wall
+  if (boid.position.y > bounds.max.y - MARGIN) {
+    const distance = boid.position.y - (bounds.max.y - MARGIN);
+    steering.y -= distance / MARGIN;
+  }
 
   return steering;
-  // boid.direction = normaliseVector(
-  //   vectorAddition(boid.direction, dirNormalised),
-  // );
 }
 
 function normaliseVector(vector: Vector): Vector {
