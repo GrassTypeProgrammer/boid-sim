@@ -16,16 +16,13 @@ export function setupSimulation(
   world.bounds.maxY = minY + height;
 }
 
-export function updateSimulation() {
+export function updateSimulation(deltaTime: number) {
   for (const boid of world.boids) {
     boid.x += boid.xv;
     boid.y += boid.yv;
-    borderAvoidance(boid);
+    borderAvoidance(deltaTime, boid);
   }
 }
-
-// TODO: Get Properly
-const DELTA_TIME: number = 0.01;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function cohesion(boid: Boid) {
@@ -42,7 +39,7 @@ function alignment(boid: Boid) {
   return boid;
 }
 
-function borderAvoidance(boid: Boid) {
+function borderAvoidance(deltaTime: number, boid: Boid) {
   // Improvement: Do the calculations before the pass the borders rather than after they pass them.
   const bounds = world.bounds;
   let dirX: number = 0;
@@ -61,8 +58,8 @@ function borderAvoidance(boid: Boid) {
   }
 
   const dirNormalised = normaliseVector(dirX, dirY);
-  boid.xv += dirNormalised.x * DELTA_TIME;
-  boid.yv += dirNormalised.y * DELTA_TIME;
+  boid.xv += dirNormalised.x * deltaTime;
+  boid.yv += dirNormalised.y * deltaTime;
 }
 
 function normaliseVector(x: number, y: number): { x: number; y: number } {

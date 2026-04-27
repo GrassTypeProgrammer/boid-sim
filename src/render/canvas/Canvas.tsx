@@ -27,8 +27,13 @@ export function Canvas() {
 
     setupSimulation(canvas.height, canvas.width);
 
-    const loop = () => {
-      updateSimulation();
+    let previousTimeStep = 0;
+
+    const loop = (timeStep: number) => {
+      const deltaTime = (timeStep - previousTimeStep) / 1000; // seconds
+      previousTimeStep = timeStep;
+
+      updateSimulation(deltaTime);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -41,7 +46,7 @@ export function Canvas() {
       frame = requestAnimationFrame(loop);
     };
 
-    loop();
+    requestAnimationFrame(loop);
 
     return () => {
       window.removeEventListener('resize', resize);
