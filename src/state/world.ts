@@ -9,3 +9,7 @@ export const world: World = {
   } as Bounds,
   boids: [],
 };
+
+export const worldValues = {
+  borderAvoidanceStrength: 1,
+};
