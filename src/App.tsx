@@ -1,10 +1,10 @@
 import './App.css';
-import { setupDebugGui } from './debug/debug';
+import { getGUI } from './debug/debug';
 import { Canvas } from './render/canvas/Canvas';
 
-function App() {
-  setupDebugGui();
+getGUI();
 
+function App() {
   return (
     <>
       <Canvas />
