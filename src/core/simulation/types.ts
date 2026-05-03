@@ -1,3 +1,5 @@
+import type { Vector } from '../math/vector';
+
 export type World = {
   bounds: Bounds;
   boids: Boid[];
@@ -15,9 +17,4 @@ export type Bounds = {
   max: Vector;
   width: number;
   height: number;
-};
-
-export type Vector = {
-  x: number;
-  y: number;
 };
