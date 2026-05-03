@@ -1,12 +1,6 @@
 import GUI from 'lil-gui';
 import { worldValues } from '../state/world';
 
-// export function setupDebugGui() {
-//   gui.add(worldValues, 'borderAvoidanceStrength', 0, 1);
-//   gui.show();
-// }
-// src/debug/gui.ts
-
 let gui: GUI | null = null;
 
 export function getGUI() {
