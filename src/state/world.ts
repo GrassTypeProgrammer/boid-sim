@@ -11,5 +11,5 @@ export const world: World = {
 };
 
 export const worldValues = {
-  borderAvoidanceStrength: 1,
+  borderAvoidanceStrength: 0.5,
 };

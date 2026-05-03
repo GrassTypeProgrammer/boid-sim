@@ -1,4 +1,4 @@
-import { world } from '../../state/world';
+import { world, worldValues } from '../../state/world';
 import type { Boid, Vector } from './types';
 
 // TODO: Get in a better way.
@@ -18,7 +18,7 @@ export function setupSimulation(
 
   if (world.boids.length === 0) {
     // TODO: Set these up better
-    for (let index = 0; index < 20; index++) {
+    for (let index = 0; index < 500; index++) {
       world.boids.push({
         position: { x: 100, y: 100 },
         velocity: { x: 0, y: 0 },
@@ -32,7 +32,13 @@ export function setupSimulation(
 export function updateSimulation(deltaTime: number) {
   for (const boid of world.boids) {
     let steering: Vector = { x: boid.direction.x, y: boid.direction.y };
-    steering = vectorAddition(steering, borderAvoidance(boid));
+    steering = vectorAddition(
+      steering,
+      scalarMultiplication(
+        borderAvoidance(boid),
+        worldValues.borderAvoidanceStrength,
+      ),
+    );
     steering = vectorAddition(steering, separation(boid));
 
     // Add all directions up and normalise once at the end, so all have equal weighting
