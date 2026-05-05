@@ -12,4 +12,5 @@ export const world: World = {
 
 export const worldValues = {
   borderAvoidanceStrength: 0.5,
+  boidAvoidanceStrength: 0.5,
 };

@@ -37,7 +37,10 @@ export function updateSimulation(deltaTime: number) {
     steering = steering.add(
       borderAvoidance(boid).multiplyScalar(worldValues.borderAvoidanceStrength),
     );
-    steering = steering.add(separation(boid));
+
+    steering = steering.add(
+      separation(boid).multiplyScalar(worldValues.boidAvoidanceStrength),
+    );
 
     // Add all directions up and normalise once at the end, so all have equal weighting
     if (steering.magnitude() > 0) {
