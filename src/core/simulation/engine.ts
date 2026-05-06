@@ -3,7 +3,8 @@ import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
 // TODO: Get in a better way.
-const MIN_DISTANCE: number = 50;
+const SEPARATION_DISTANCE: number = 50;
+const COHESION_DISTANCE: number = 100;
 
 // TODO: have a restulf faux api to edit the bounds
 export function setupSimulation(
@@ -19,7 +20,7 @@ export function setupSimulation(
 
   if (world.boids.length === 0) {
     // TODO: Set these up better
-    for (let index = 0; index < 500; index++) {
+    for (let index = 0; index < 50; index++) {
       world.boids.push({
         position: new Vector(100, 100),
         velocity: new Vector(0, 0),
@@ -42,6 +43,10 @@ export function updateSimulation(deltaTime: number) {
       separation(boid).multiplyScalar(worldValues.boidAvoidanceStrength),
     );
 
+    steering = steering.add(
+      cohesion(boid).multiplyScalar(worldValues.cohesionStrength),
+    );
+
     // Add all directions up and normalise once at the end, so all have equal weighting
     if (steering.magnitude() > 0) {
       boid.direction = steering.add(boid.direction).normalised();
@@ -52,9 +57,34 @@ export function updateSimulation(deltaTime: number) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function cohesion(boid: Boid) {
-  return boid;
+  // add all positions
+  // dived by number of boids
+  // move towards that position.
+  let center: Vector = new Vector(0, 0).add(boid.position);
+  let neighbours: number = 0;
+
+  for (let index = 0; index < world.boids.length; index++) {
+    const neighbour = world.boids[index];
+
+    if (neighbour === boid) continue;
+
+    const distance = boid.position.distance(neighbour.position);
+
+    if (distance <= COHESION_DISTANCE) {
+      center = center.add(neighbour.position);
+      neighbours++;
+    }
+  }
+
+  if (neighbours === 0) {
+    return new Vector(0, 0);
+  }
+
+  center = center.divideScalar(neighbours);
+  const steering: Vector = center.subtract(boid.position).normalised();
+
+  return steering;
 }
 
 function separation(boid: Boid): Vector {
@@ -68,10 +98,10 @@ function separation(boid: Boid): Vector {
 
     const distance = boid.position.distance(neighbour.position);
 
-    if (distance <= MIN_DISTANCE) {
+    if (distance <= SEPARATION_DISTANCE) {
       const away = boid.position.subtract(neighbour.position).normalised();
 
-      // wieght by distance
+      // weight by distance
       const weight = 1 / distance;
       steering = steering.add(away.multiplyScalar(weight));
     }

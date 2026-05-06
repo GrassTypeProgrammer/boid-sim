@@ -24,6 +24,10 @@ export class Vector {
     return new Vector(0, 0);
   }
 
+  divideScalar(scalar: number): Vector {
+    return new Vector(this.x / scalar, this.y / scalar);
+  }
+
   magnitude(): number {
     return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
   }
@@ -44,5 +48,9 @@ export class Vector {
     const partB = Math.pow(this.y - v.y, 2);
     const distance = Math.sqrt(partA + partB);
     return distance;
+  }
+
+  log(): void {
+    console.log('x: ' + this.x + ', y: ' + this.y);
   }
 }

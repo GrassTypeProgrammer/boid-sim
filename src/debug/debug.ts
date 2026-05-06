@@ -8,6 +8,7 @@ export function getGUI() {
     gui = new GUI();
     gui.add(worldValues, 'borderAvoidanceStrength', 0, 1);
     gui.add(worldValues, 'boidAvoidanceStrength', 0, 1);
+    gui.add(worldValues, 'cohesionStrength', 0, 1);
   }
 
   return gui;
