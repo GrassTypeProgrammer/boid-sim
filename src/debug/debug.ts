@@ -7,10 +7,15 @@ export function getGUI() {
   if (!gui) {
     gui = new GUI();
     gui.add(worldValues, 'borderAvoidanceStrength', 0, 1);
+
     gui.add(worldValues, 'boidAvoidanceStrength', 0, 1);
-    gui.add(worldValues, 'cohesionStrength', 0, 1);
     gui.add(worldValues, 'separationDistance', 0, 200);
+
+    gui.add(worldValues, 'cohesionStrength', 0, 0.5);
     gui.add(worldValues, 'cohesionDistance', 0, 200);
+
+    gui.add(worldValues, 'alignmentDistance', 0, 200);
+    gui.add(worldValues, 'alignmentStrength', 0, 0.5);
   }
 
   return gui;

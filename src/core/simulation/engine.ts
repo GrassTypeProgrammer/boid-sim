@@ -43,6 +43,10 @@ export function updateSimulation(deltaTime: number) {
       cohesion(boid).multiplyScalar(worldValues.cohesionStrength),
     );
 
+    steering = steering.add(
+      alignment(boid).multiplyScalar(worldValues.alignmentStrength),
+    );
+
     // Add all directions up and normalise once at the end, so all have equal weighting
     if (steering.magnitude() > 0) {
       boid.direction = steering.add(boid.direction).normalised();
@@ -106,9 +110,35 @@ function separation(boid: Boid): Vector {
   return steering;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function alignment(boid: Boid) {
-  return boid;
+  // add all directions within range
+  // divide by number of boids
+  // get direction towards that point
+
+  let destination: Vector = new Vector(0, 0).add(boid.position);
+  let neighbours: number = 0;
+
+  for (let index = 0; index < world.boids.length; index++) {
+    const neighbour = world.boids[index];
+
+    if (neighbour === boid) continue;
+
+    const distance = boid.position.distance(neighbour.position);
+
+    if (distance <= worldValues.cohesionDistance) {
+      destination = destination.add(neighbour.direction);
+      neighbours++;
+    }
+  }
+
+  if (neighbours === 0) {
+    return new Vector(0, 0);
+  }
+
+  destination = destination.divideScalar(neighbours);
+  const steering: Vector = destination.subtract(boid.position).normalised();
+
+  return steering;
 }
 
 function borderAvoidance(boid: Boid): Vector {
