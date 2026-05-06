@@ -9,6 +9,8 @@ export function getGUI() {
     gui.add(worldValues, 'borderAvoidanceStrength', 0, 1);
     gui.add(worldValues, 'boidAvoidanceStrength', 0, 1);
     gui.add(worldValues, 'cohesionStrength', 0, 1);
+    gui.add(worldValues, 'separationDistance', 0, 200);
+    gui.add(worldValues, 'cohesionDistance', 0, 200);
   }
 
   return gui;

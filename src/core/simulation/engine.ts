@@ -2,10 +2,6 @@ import { world, worldValues } from '../../state/world';
 import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
-// TODO: Get in a better way.
-const SEPARATION_DISTANCE: number = 50;
-const COHESION_DISTANCE: number = 100;
-
 // TODO: have a restulf faux api to edit the bounds
 export function setupSimulation(
   height: number,
@@ -71,7 +67,7 @@ function cohesion(boid: Boid) {
 
     const distance = boid.position.distance(neighbour.position);
 
-    if (distance <= COHESION_DISTANCE) {
+    if (distance <= worldValues.cohesionDistance) {
       center = center.add(neighbour.position);
       neighbours++;
     }
@@ -98,7 +94,7 @@ function separation(boid: Boid): Vector {
 
     const distance = boid.position.distance(neighbour.position);
 
-    if (distance <= SEPARATION_DISTANCE) {
+    if (distance <= worldValues.separationDistance) {
       const away = boid.position.subtract(neighbour.position).normalised();
 
       // weight by distance
