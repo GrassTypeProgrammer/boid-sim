@@ -2,7 +2,18 @@ import { world, worldValues } from '../../state/world';
 import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
-// TODO: have a restulf faux api to edit the bounds
+// TODO: Have another look at border avoidance. see the webpage about what they do. At least add a border avoidance deistance
+// TODO: refine values so the sim looks good
+// TODO: Add a bias so that they prefer to be with their own group (see webpage). give groups colours so you can tell.
+// TODO: Change the number of boids on the fly in debug? or add a button to reset the sim when you change it.
+// TODO: Make the boids triangles.
+// TODO: Make boids selectable.
+//    this means also changing the values for that boid. Eg: group it's in, speed?, etc...?
+//    selected boid has x colour/outline. neighbours have different colour/outline. too close ones have red colour/outline (leaning towards outline).
+// TODO: Add obstacles and obstacle avoidance.
+// TODO: Improve spawning so they're not just in a line.
+// TODO: allow size change.
+// TODO: organise debug.
 export function setupSimulation(
   height: number,
   width: number,
@@ -15,7 +26,6 @@ export function setupSimulation(
   world.bounds.max = new Vector(minX + width, minY + height);
 
   if (world.boids.length === 0) {
-    // TODO: Set these up better
     for (let index = 0; index < 50; index++) {
       world.boids.push({
         position: new Vector(100, 100),
@@ -102,8 +112,12 @@ function separation(boid: Boid): Vector {
       const away = boid.position.subtract(neighbour.position).normalised();
 
       // weight by distance
-      const weight = 1 / distance;
-      steering = steering.add(away.multiplyScalar(weight));
+      // TODO: This wieghting has a big effect. if removed, you'll see what I mean. This is causing separation to behave differently to
+      //      the others. Either they should all be weighted or none should (currently leaning towards none for now. When you add weighting
+      //      to all, if should also be a debug value for how strong it is).
+      // const weight = 1 / distance;
+      // steering = steering.add(away.multiplyScalar(weight));
+      steering = steering.add(away);
     }
   }
 
