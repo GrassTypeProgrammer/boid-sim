@@ -42,9 +42,8 @@ export function updateSimulation(deltaTime: number) {
     let steering: Vector = new Vector(boid.direction.x, boid.direction.y);
 
     steering = steering.add(
-      borderAvoidance(boid).multiplyScalar(worldValues.borderAvoidanceStrength),
+      borderAvoidance(boid).multiplyScalar(worldValues.turnFactor),
     );
-
     steering = steering.add(
       separation(boid).multiplyScalar(worldValues.boidAvoidanceStrength),
     );
@@ -157,32 +156,31 @@ function alignment(boid: Boid) {
 
 function borderAvoidance(boid: Boid): Vector {
   const bounds = world.bounds;
-  const MARGIN = 50;
-
+  const margin = worldValues.borderMargin;
   let steering = new Vector(0, 0);
 
   // Left wall
-  if (boid.position.x < bounds.min.x + MARGIN) {
-    const distance = bounds.min.x + MARGIN - boid.position.x;
-    steering = steering.add(new Vector(distance / MARGIN, 0));
+  if (boid.position.x < bounds.min.x + margin) {
+    const distance = bounds.min.x + margin - boid.position.x;
+    steering = steering.add(new Vector(distance / margin, 0));
   }
 
   // Right wall
-  if (boid.position.x > bounds.max.x - MARGIN) {
-    const distance = boid.position.x - (bounds.max.x - MARGIN);
-    steering = steering.subtract(new Vector(distance / MARGIN, 0));
+  if (boid.position.x > bounds.max.x - margin) {
+    const distance = boid.position.x - (bounds.max.x - margin);
+    steering = steering.subtract(new Vector(distance / margin, 0));
   }
 
   // Top wall
-  if (boid.position.y < bounds.min.y + MARGIN) {
-    const distance = bounds.min.y + MARGIN - boid.position.y;
-    steering = steering.add(new Vector(0, distance / MARGIN));
+  if (boid.position.y < bounds.min.y + margin) {
+    const distance = bounds.min.y + margin - boid.position.y;
+    steering = steering.add(new Vector(0, distance / margin));
   }
 
   // Bottom wall
-  if (boid.position.y > bounds.max.y - MARGIN) {
-    const distance = boid.position.y - (bounds.max.y - MARGIN);
-    steering = steering.subtract(new Vector(0, distance / MARGIN));
+  if (boid.position.y > bounds.max.y - margin) {
+    const distance = boid.position.y - (bounds.max.y - margin);
+    steering = steering.subtract(new Vector(0, distance / margin));
   }
 
   return steering;

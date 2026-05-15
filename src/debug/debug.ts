@@ -6,7 +6,8 @@ let gui: GUI | null = null;
 export function getGUI() {
   if (!gui) {
     gui = new GUI();
-    gui.add(worldValues, 'borderAvoidanceStrength', 0, 1);
+    gui.add(worldValues, 'turnFactor', 0, 1);
+    gui.add(worldValues, 'borderMargin', 1, 100);
 
     gui.add(worldValues, 'boidAvoidanceStrength', 0, 1);
     gui.add(worldValues, 'separationDistance', 0, 200);
