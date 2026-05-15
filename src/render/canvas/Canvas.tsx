@@ -3,7 +3,7 @@ import {
   setupSimulation,
   updateSimulation,
 } from '../../core/simulation/engine';
-import { debugValues, world } from '../../state/world';
+import { debugValues, world, worldValues } from '../../state/world';
 
 export function Canvas() {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -63,7 +63,13 @@ export function Canvas() {
         if (debugValues.neighbourRadius) {
           const boid = world.boids[0];
           ctx.beginPath();
-          ctx.arc(boid.position.x, boid.position.y, 50, 0, Math.PI * 2);
+          ctx.arc(
+            boid.position.x,
+            boid.position.y,
+            worldValues.neighbourDistance,
+            0,
+            Math.PI * 2,
+          );
           ctx.fillStyle = '#00000000';
           ctx.lineWidth = 2;
           ctx.strokeStyle = 'red';
