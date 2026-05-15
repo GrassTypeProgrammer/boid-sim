@@ -25,8 +25,7 @@ export const worldValues = {
   alignmentStrength: 0.265,
   cohesionStrength: 0.33,
   separationDistance: 15,
-  cohesionDistance: 50,
-  alignmentDistance: 50,
+  neighbourDistance: 50,
 };
 
 export const debugValues = {

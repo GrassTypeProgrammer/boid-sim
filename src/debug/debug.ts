@@ -9,13 +9,11 @@ export function getGUI() {
     gui.add(worldValues, 'turnFactor', 0, 1);
     gui.add(worldValues, 'borderMargin', 1, 100);
 
-    gui.add(worldValues, 'boidAvoidanceStrength', 0, 1);
     gui.add(worldValues, 'separationDistance', 0, 200);
+    gui.add(worldValues, 'neighbourDistance', 0, 200);
 
     gui.add(worldValues, 'cohesionStrength', 0, 0.5);
-    gui.add(worldValues, 'cohesionDistance', 0, 200);
-
-    gui.add(worldValues, 'alignmentDistance', 0, 200);
+    gui.add(worldValues, 'boidAvoidanceStrength', 0, 1);
     gui.add(worldValues, 'alignmentStrength', 0, 0.5);
 
     gui.add(debugValues, 'showNeighbours');

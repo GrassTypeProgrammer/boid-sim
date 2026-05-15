@@ -86,7 +86,7 @@ function cohesion(boid: Boid) {
 
     const distance = boid.position.distance(neighbour.position);
 
-    if (distance <= worldValues.cohesionDistance) {
+    if (distance <= worldValues.neighbourDistance) {
       center = center.add(neighbour.position);
       neighbours++;
     }
@@ -144,7 +144,7 @@ function alignment(boid: Boid) {
 
     const distance = boid.position.distance(neighbour.position);
 
-    if (distance <= worldValues.cohesionDistance) {
+    if (distance <= worldValues.neighbourDistance) {
       destination = destination.add(neighbour.direction);
       neighbours++;
     }
@@ -203,7 +203,7 @@ function setNeighbours(boid: Boid): void {
 
     const distance = boid.position.distance(neighbour.position);
 
-    if (distance <= worldValues.cohesionDistance) {
+    if (distance <= worldValues.neighbourDistance) {
       neighbour.isNeighbour = true;
     } else {
       neighbour.isNeighbour = false;
