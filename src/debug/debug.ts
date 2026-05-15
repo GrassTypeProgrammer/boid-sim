@@ -18,6 +18,7 @@ export function getGUI() {
 
     gui.add(debugValues, 'showNeighbours');
     gui.add(debugValues, 'pause');
+    gui.add(debugValues, 'neighbourRadius');
   }
 
   return gui;

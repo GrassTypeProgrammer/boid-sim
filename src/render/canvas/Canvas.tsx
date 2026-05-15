@@ -49,7 +49,7 @@ export function Canvas() {
             if (index === 0) {
               ctx.fillStyle = '#87CEFA';
             } else if (boid.isNeighbour) {
-              ctx.fillStyle = '#EE4B2B';
+              ctx.fillStyle = 'red';
             } else {
               ctx.fillStyle = '#121212';
             }
@@ -57,6 +57,17 @@ export function Canvas() {
             ctx.fillStyle = '#121212';
           }
 
+          ctx.fill();
+        }
+
+        if (debugValues.neighbourRadius) {
+          const boid = world.boids[0];
+          ctx.beginPath();
+          ctx.arc(boid.position.x, boid.position.y, 50, 0, Math.PI * 2);
+          ctx.fillStyle = '#00000000';
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'red';
+          ctx.stroke();
           ctx.fill();
         }
       }

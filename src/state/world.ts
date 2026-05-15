@@ -31,4 +31,5 @@ export const worldValues = {
 export const debugValues = {
   showNeighbours: true,
   pause: false,
+  neighbourRadius: true,
 };
