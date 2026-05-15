@@ -50,6 +50,14 @@ export class Vector {
     return distance;
   }
 
+  perpendicularClockwise(): Vector {
+    return new Vector(this.y, -this.x);
+  }
+
+  perpendicularAnticlockwise(): Vector {
+    return new Vector(-this.y, this.x);
+  }
+
   log(): void {
     console.log('x: ' + this.x + ', y: ' + this.y);
   }

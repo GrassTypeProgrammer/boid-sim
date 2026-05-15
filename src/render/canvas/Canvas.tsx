@@ -4,6 +4,7 @@ import {
   updateSimulation,
 } from '../../core/simulation/engine';
 import { debugValues, world, worldValues } from '../../state/world';
+import { Vector } from '../../core/math/vector';
 
 export function Canvas() {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -41,7 +42,16 @@ export function Canvas() {
         for (let index = 0; index < world.boids.length; index++) {
           const boid = world.boids[index];
           ctx.beginPath();
-          ctx.arc(boid.position.x, boid.position.y, 5, 0, Math.PI * 2);
+
+          const { front, left, right } = calculatTriangleCoordinates(
+            boid.position,
+            boid.direction,
+            8,
+          );
+
+          ctx.moveTo(front.x, front.y);
+          ctx.lineTo(right.x, right.y);
+          ctx.lineTo(left.x, left.y);
 
           // TODO: If show neighbours is false, the else triggers every frame. You could improve performance by having it only happen
           //    when swappingfrom true to false.
@@ -90,4 +100,21 @@ export function Canvas() {
   }, []);
 
   return <canvas ref={ref} />;
+}
+
+function calculatTriangleCoordinates(
+  position: Vector,
+  direction: Vector,
+  height: number,
+): { front: Vector; left: Vector; right: Vector } {
+  const front: Vector = position.add(direction.multiplyScalar(height));
+  const back: Vector = position.subtract(direction.multiplyScalar(height));
+  const left: Vector = back.add(
+    direction.perpendicularAnticlockwise().multiplyScalar(height / 1.5),
+  );
+  const right: Vector = back.add(
+    direction.perpendicularClockwise().multiplyScalar(height / 1.5),
+  );
+
+  return { front, left, right };
 }

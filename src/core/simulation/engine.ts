@@ -7,7 +7,6 @@ import type { Boid } from './types';
 // TODO: refine values so the sim looks good
 // TODO: Add a bias so that they prefer to be with their own group (see webpage). give groups colours so you can tell.
 // TODO: Change the number of boids on the fly in debug? or add a button to reset the sim when you change it.
-// TODO: Make the boids triangles.
 // TODO: Make boids selectable.
 //    this means also changing the values for that boid. Eg: group it's in, speed?, etc...?
 //    selected boid has x colour/outline. neighbours have different colour/outline. too close ones have red colour/outline (leaning towards outline).
