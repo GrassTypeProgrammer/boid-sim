@@ -28,3 +28,7 @@ export const worldValues = {
   cohesionDistance: 50,
   alignmentDistance: 50,
 };
+
+export const debugValues = {
+  showNeighbours: true,
+};

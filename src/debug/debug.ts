@@ -1,5 +1,5 @@
 import GUI from 'lil-gui';
-import { worldValues } from '../state/world';
+import { debugValues, worldValues } from '../state/world';
 
 let gui: GUI | null = null;
 
@@ -17,6 +17,8 @@ export function getGUI() {
 
     gui.add(worldValues, 'alignmentDistance', 0, 200);
     gui.add(worldValues, 'alignmentStrength', 0, 0.5);
+
+    gui.add(debugValues, 'showNeighbours');
   }
 
   return gui;

@@ -10,6 +10,7 @@ export type Boid = {
   velocity: Vector;
   direction: Vector;
   speed: number;
+  isNeighbour: boolean;
 };
 
 export type Bounds = {

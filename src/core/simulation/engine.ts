@@ -1,4 +1,4 @@
-import { world, worldValues } from '../../state/world';
+import { debugValues, world, worldValues } from '../../state/world';
 import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
@@ -32,12 +32,18 @@ export function setupSimulation(
         velocity: new Vector(0, 0),
         direction: new Vector(2 + index * 10, 1),
         speed: 100,
+        isNeighbour: false,
       });
     }
   }
 }
 
 export function updateSimulation(deltaTime: number) {
+  // debug
+  if (debugValues.showNeighbours) {
+    setNeighbours(world.boids[0]);
+  }
+
   for (const boid of world.boids) {
     let steering: Vector = new Vector(boid.direction.x, boid.direction.y);
 
@@ -184,4 +190,23 @@ function borderAvoidance(boid: Boid): Vector {
   }
 
   return steering;
+}
+
+function setNeighbours(boid: Boid): void {
+  for (let index = 0; index < world.boids.length; index++) {
+    const neighbour = world.boids[index];
+
+    if (neighbour === boid) {
+      neighbour.isNeighbour = false;
+      continue;
+    }
+
+    const distance = boid.position.distance(neighbour.position);
+
+    if (distance <= worldValues.cohesionDistance) {
+      neighbour.isNeighbour = true;
+    } else {
+      neighbour.isNeighbour = false;
+    }
+  }
 }

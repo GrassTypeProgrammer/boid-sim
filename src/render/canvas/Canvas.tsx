@@ -3,7 +3,7 @@ import {
   setupSimulation,
   updateSimulation,
 } from '../../core/simulation/engine';
-import { world } from '../../state/world';
+import { debugValues, world } from '../../state/world';
 
 export function Canvas() {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -37,9 +37,25 @@ export function Canvas() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (const boid of world.boids) {
+      for (let index = 0; index < world.boids.length; index++) {
+        const boid = world.boids[index];
         ctx.beginPath();
         ctx.arc(boid.position.x, boid.position.y, 5, 0, Math.PI * 2);
+
+        // TODO: If show neighbours is false, the else triggers every frame. You could improve performance by having it only happen
+        //    when swappingfrom true to false.
+        if (debugValues.showNeighbours) {
+          if (index === 0) {
+            ctx.fillStyle = '#87CEFA';
+          } else if (boid.isNeighbour) {
+            ctx.fillStyle = '#EE4B2B';
+          } else {
+            ctx.fillStyle = '#121212';
+          }
+        } else {
+          ctx.fillStyle = '#121212';
+        }
+
         ctx.fill();
       }
 
