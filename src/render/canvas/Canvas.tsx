@@ -33,30 +33,32 @@ export function Canvas() {
       const deltaTime = (timeStep - previousTimeStep) / 1000; // seconds
       previousTimeStep = timeStep;
 
-      updateSimulation(deltaTime);
+      if (!debugValues.pause) {
+        updateSimulation(deltaTime);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let index = 0; index < world.boids.length; index++) {
-        const boid = world.boids[index];
-        ctx.beginPath();
-        ctx.arc(boid.position.x, boid.position.y, 5, 0, Math.PI * 2);
+        for (let index = 0; index < world.boids.length; index++) {
+          const boid = world.boids[index];
+          ctx.beginPath();
+          ctx.arc(boid.position.x, boid.position.y, 5, 0, Math.PI * 2);
 
-        // TODO: If show neighbours is false, the else triggers every frame. You could improve performance by having it only happen
-        //    when swappingfrom true to false.
-        if (debugValues.showNeighbours) {
-          if (index === 0) {
-            ctx.fillStyle = '#87CEFA';
-          } else if (boid.isNeighbour) {
-            ctx.fillStyle = '#EE4B2B';
+          // TODO: If show neighbours is false, the else triggers every frame. You could improve performance by having it only happen
+          //    when swappingfrom true to false.
+          if (debugValues.showNeighbours) {
+            if (index === 0) {
+              ctx.fillStyle = '#87CEFA';
+            } else if (boid.isNeighbour) {
+              ctx.fillStyle = '#EE4B2B';
+            } else {
+              ctx.fillStyle = '#121212';
+            }
           } else {
             ctx.fillStyle = '#121212';
           }
-        } else {
-          ctx.fillStyle = '#121212';
-        }
 
-        ctx.fill();
+          ctx.fill();
+        }
       }
 
       frame = requestAnimationFrame(loop);

@@ -19,6 +19,7 @@ export function getGUI() {
     gui.add(worldValues, 'alignmentStrength', 0, 0.5);
 
     gui.add(debugValues, 'showNeighbours');
+    gui.add(debugValues, 'pause');
   }
 
   return gui;
