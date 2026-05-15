@@ -11,12 +11,20 @@ export const world: World = {
 };
 
 export const worldValues = {
+  // turnFactor: 0.1,
+  // borderMargin: 100,
+  // boidAvoidanceStrength: 0.06,
+  // alignmentStrength: 0.0265,
+  // cohesionStrength: 0.033,
+  // separationDistance: 15,
+  // cohesionDistance: 100,
+  // alignmentDistance: 100,
   turnFactor: 0.1,
   borderMargin: 100,
-  boidAvoidanceStrength: 0.5,
-  alignmentStrength: 0.01,
-  cohesionStrength: 0.01,
-  separationDistance: 50,
-  cohesionDistance: 100,
-  alignmentDistance: 100,
+  boidAvoidanceStrength: 0.06,
+  alignmentStrength: 0.265,
+  cohesionStrength: 0.33,
+  separationDistance: 15,
+  cohesionDistance: 50,
+  alignmentDistance: 50,
 };
