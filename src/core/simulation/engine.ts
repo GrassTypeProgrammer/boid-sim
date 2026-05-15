@@ -2,6 +2,7 @@ import { debugValues, world, worldValues } from '../../state/world';
 import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
+// TODO: Cap speed between a min and a max but otherwise allow it to be variable. This should help them look more organic
 // TODO: Have another look at border avoidance. see the webpage about what they do. At least add a border avoidance deistance
 // TODO: refine values so the sim looks good
 // TODO: Add a bias so that they prefer to be with their own group (see webpage). give groups colours so you can tell.
