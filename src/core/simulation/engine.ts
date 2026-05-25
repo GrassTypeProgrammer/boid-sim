@@ -2,9 +2,6 @@ import { debugValues, world, worldValues } from '../../state/world';
 import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
-const MIN_SPEED: number = 0.5;
-const MAX_SPEED: number = 1;
-
 // TODO: Cap speed between a min and a max but otherwise allow it to be variable. This should help them look more organic
 // TODO: Have another look at border avoidance. see the webpage about what they do. At least add a border avoidance deistance
 // TODO: refine values so the sim looks good
@@ -29,10 +26,10 @@ export function setupSimulation(
   world.bounds.max = new Vector(minX + width, minY + height);
 
   if (world.boids.length === 0) {
-    for (let index = 0; index < 50; index++) {
+    for (let index = 0; index < 500; index++) {
       world.boids.push({
         position: new Vector(100 + 10 * index, 100 + 10 * index),
-        velocity: new Vector(1, 0),
+        velocity: new Vector(400, 0),
         direction: new Vector(2 + index * 10, 1),
         speed: 100,
         isNeighbour: false,
@@ -41,7 +38,7 @@ export function setupSimulation(
   }
 }
 
-export function updateSimulation(_deltaTime: number) {
+export function updateSimulation(deltaTime: number) {
   // debug
   if (debugValues.showNeighbours) {
     setNeighbours(world.boids[0]);
@@ -50,28 +47,56 @@ export function updateSimulation(_deltaTime: number) {
   for (const boid of world.boids) {
     let velocity: Vector = boid.velocity;
 
-    velocity = velocity.add(separation(boid));
-    velocity = velocity.add(alignment(boid));
-    velocity = velocity.add(cohesion(boid));
-    velocity = velocity.add(borderAvoidance(boid));
+    // velocity = velocity.add(separation(boid));
+    // velocity = velocity.add(alignment(boid));
+    // velocity = velocity.add(cohesion(boid));
+    // velocity = velocity.add(borderAvoidance(boid));
+
+    // boid.velocity = velocity;
+    // boid.direction = boid.velocity.normalised();
+
+    // const speed = boid.velocity.magnitude();
+    // console.log('speed: ' + speed);
+    // if (speed > MAX_SPEED) {
+    //   boid.velocity = boid.velocity
+    //     .divideScalar(speed)
+    //     .multiplyScalar(MAX_SPEED);
+    // } else if (speed < MIN_SPEED) {
+    //   boid.velocity = boid.velocity
+    //     .divideScalar(speed)
+    //     .multiplyScalar(MIN_SPEED);
+    // }
+
+    // boid.position = boid.position.add(boid.velocity);
+
+    let acceleration = new Vector(0, 0);
+
+    acceleration = acceleration.add(separation(boid));
+    acceleration = acceleration.add(alignment(boid));
+    acceleration = acceleration.add(cohesion(boid));
+    acceleration = acceleration.add(borderAvoidance(boid));
+
+    acceleration = limit(acceleration, worldValues.maxForce);
+
+    velocity = velocity.add(acceleration.multiplyScalar(deltaTime));
+    velocity = limit(velocity, worldValues.maxSpeed, worldValues.minSpeed);
 
     boid.velocity = velocity;
-    boid.direction = boid.velocity.normalised();
-
-    const speed = boid.velocity.magnitude();
-    console.log('speed: ' + speed);
-    if (speed > MAX_SPEED) {
-      boid.velocity = boid.velocity
-        .divideScalar(speed)
-        .multiplyScalar(MAX_SPEED);
-    } else if (speed < MIN_SPEED) {
-      boid.velocity = boid.velocity
-        .divideScalar(speed)
-        .multiplyScalar(MIN_SPEED);
-    }
-
-    boid.position = boid.position.add(boid.velocity);
+    boid.direction = velocity.normalised();
+    boid.position = boid.position.add(velocity.multiplyScalar(deltaTime));
   }
+}
+
+function limit(vector: Vector, max: number, min: number = 0): Vector {
+  const magnitude = vector.magnitude();
+
+  if (magnitude > max) {
+    return vector.divideScalar(magnitude).multiplyScalar(max);
+  } else if (magnitude < min) {
+    return vector.divideScalar(magnitude).multiplyScalar(min);
+  }
+
+  return vector;
 }
 
 function cohesion(boid: Boid) {
@@ -168,31 +193,39 @@ function alignment(boid: Boid) {
 
 function borderAvoidance(boid: Boid): Vector {
   const bounds = world.bounds;
-  const margin = worldValues.borderMargin;
-  // const steering = new Vector(0, 0);
-  let velocity = new Vector(0, 0);
+  const borderMargin = worldValues.borderMargin;
+
+  let force = new Vector(0, 0);
 
   // Left wall
-  if (boid.position.x < bounds.min.x + margin) {
-    velocity = velocity.add(new Vector(worldValues.turnFactor, 0));
+  const distanceFromLeftWall = boid.position.x - bounds.min.x;
+  if (distanceFromLeftWall < borderMargin) {
+    const strength = 1 - distanceFromLeftWall / borderMargin;
+    force = force.add(new Vector(worldValues.turnFactor * strength, 0));
   }
 
   // Right wall
-  if (boid.position.x > bounds.max.x - margin) {
-    velocity = velocity.subtract(new Vector(worldValues.turnFactor, 0));
+  const distanceFromRightWall = bounds.max.x - boid.position.x;
+  if (distanceFromRightWall < borderMargin) {
+    const strength = 1 - distanceFromRightWall / borderMargin;
+    force = force.subtract(new Vector(worldValues.turnFactor * strength, 0));
   }
 
   // Top wall
-  if (boid.position.y < bounds.min.y + margin) {
-    velocity = velocity.add(new Vector(0, worldValues.turnFactor));
+  const distanceFromTopWall = boid.position.y - bounds.min.y;
+  if (distanceFromTopWall < borderMargin) {
+    const strength = 1 - distanceFromTopWall / borderMargin;
+    force = force.add(new Vector(0, worldValues.turnFactor * strength));
   }
 
   // Bottom wall
-  if (boid.position.y > bounds.max.y - margin) {
-    velocity = velocity.subtract(new Vector(0, worldValues.turnFactor));
+  const distanceFromBottomWall = bounds.max.y - boid.position.y;
+  if (distanceFromBottomWall < borderMargin) {
+    const strength = 1 - distanceFromBottomWall / borderMargin;
+    force = force.subtract(new Vector(0, worldValues.turnFactor * strength));
   }
 
-  return velocity;
+  return force;
 }
 
 function setNeighbours(boid: Boid): void {

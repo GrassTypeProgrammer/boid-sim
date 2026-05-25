@@ -11,13 +11,16 @@ export const world: World = {
 };
 
 export const worldValues = {
-  turnFactor: 0.2,
+  turnFactor: 463,
   borderMargin: 100,
-  boidAvoidanceStrength: 0.05,
-  alignmentStrength: 0.05,
-  cohesionStrength: 0.0005,
+  boidAvoidanceStrength: 47,
+  alignmentStrength: 30,
+  cohesionStrength: 5,
   separationDistance: 16,
-  neighbourDistance: 40,
+  neighbourDistance: 50,
+  maxSpeed: 160,
+  minSpeed: 120,
+  maxForce: 110,
 };
 
 export const debugValues = {

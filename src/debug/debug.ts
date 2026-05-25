@@ -9,12 +9,12 @@ export function getGUI() {
     const boidFolder = gui.addFolder('Boids');
     const borderFolder = boidFolder.addFolder('Borders');
     // TODO: Rename turnfactor and borderMargin
-    borderFolder.add(worldValues, 'turnFactor', 0, 1);
-    borderFolder.add(worldValues, 'borderMargin', 1, 100);
+    borderFolder.add(worldValues, 'turnFactor', 0, 1000);
+    borderFolder.add(worldValues, 'borderMargin', 1, 1000);
 
     const distanceFolder = boidFolder.addFolder('Distances');
     distanceFolder
-      .add(worldValues, 'separationDistance', 0, 200)
+      .add(worldValues, 'separationDistance', 0, 50)
       .name('Separation');
     distanceFolder
       .add(worldValues, 'neighbourDistance', 0, 200)
@@ -22,14 +22,19 @@ export function getGUI() {
 
     const strengthFolder = boidFolder.addFolder('Strengths');
     strengthFolder
-      .add(worldValues, 'cohesionStrength', 0, 0.5)
+      .add(worldValues, 'cohesionStrength', 0, 100)
       .name('Cohesion');
     strengthFolder
-      .add(worldValues, 'boidAvoidanceStrength', 0, 1)
+      .add(worldValues, 'boidAvoidanceStrength', 0, 100)
       .name('Boid Avoidance');
     strengthFolder
-      .add(worldValues, 'alignmentStrength', 0, 0.5)
+      .add(worldValues, 'alignmentStrength', 0, 100)
       .name('Alignment');
+
+    const speedFolder = boidFolder.addFolder('Speed');
+    speedFolder.add(worldValues, 'maxSpeed', 0, 1000);
+    speedFolder.add(worldValues, 'minSpeed', 0, 1000);
+    speedFolder.add(worldValues, 'maxForce', 0, 1000);
 
     const debugGui: GUI = gui.addFolder('Debug');
     debugGui.add(debugValues, 'showNeighbours');
