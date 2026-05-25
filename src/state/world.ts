@@ -11,21 +11,13 @@ export const world: World = {
 };
 
 export const worldValues = {
-  // turnFactor: 0.1,
-  // borderMargin: 100,
-  // boidAvoidanceStrength: 0.06,
-  // alignmentStrength: 0.0265,
-  // cohesionStrength: 0.033,
-  // separationDistance: 15,
-  // cohesionDistance: 100,
-  // alignmentDistance: 100,
-  turnFactor: 0.1,
+  turnFactor: 0.2,
   borderMargin: 100,
-  boidAvoidanceStrength: 0.06,
-  alignmentStrength: 0.265,
-  cohesionStrength: 0.33,
-  separationDistance: 15,
-  neighbourDistance: 50,
+  boidAvoidanceStrength: 0.05,
+  alignmentStrength: 0.05,
+  cohesionStrength: 0.0005,
+  separationDistance: 16,
+  neighbourDistance: 40,
 };
 
 export const debugValues = {

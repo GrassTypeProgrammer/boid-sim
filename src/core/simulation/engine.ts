@@ -2,6 +2,9 @@ import { debugValues, world, worldValues } from '../../state/world';
 import { Vector } from '../math/vector';
 import type { Boid } from './types';
 
+const MIN_SPEED: number = 0.5;
+const MAX_SPEED: number = 1;
+
 // TODO: Cap speed between a min and a max but otherwise allow it to be variable. This should help them look more organic
 // TODO: Have another look at border avoidance. see the webpage about what they do. At least add a border avoidance deistance
 // TODO: refine values so the sim looks good
@@ -28,8 +31,8 @@ export function setupSimulation(
   if (world.boids.length === 0) {
     for (let index = 0; index < 50; index++) {
       world.boids.push({
-        position: new Vector(100, 100),
-        velocity: new Vector(0, 0),
+        position: new Vector(100 + 10 * index, 100 + 10 * index),
+        velocity: new Vector(1, 0),
         direction: new Vector(2 + index * 10, 1),
         speed: 100,
         isNeighbour: false,
@@ -38,36 +41,35 @@ export function setupSimulation(
   }
 }
 
-export function updateSimulation(deltaTime: number) {
+export function updateSimulation(_deltaTime: number) {
   // debug
   if (debugValues.showNeighbours) {
     setNeighbours(world.boids[0]);
   }
 
   for (const boid of world.boids) {
-    let steering: Vector = new Vector(boid.direction.x, boid.direction.y);
+    let velocity: Vector = boid.velocity;
 
-    steering = steering.add(
-      borderAvoidance(boid).multiplyScalar(worldValues.turnFactor),
-    );
-    steering = steering.add(
-      separation(boid).multiplyScalar(worldValues.boidAvoidanceStrength),
-    );
+    velocity = velocity.add(separation(boid));
+    velocity = velocity.add(alignment(boid));
+    velocity = velocity.add(cohesion(boid));
+    velocity = velocity.add(borderAvoidance(boid));
 
-    steering = steering.add(
-      cohesion(boid).multiplyScalar(worldValues.cohesionStrength),
-    );
+    boid.velocity = velocity;
+    boid.direction = boid.velocity.normalised();
 
-    steering = steering.add(
-      alignment(boid).multiplyScalar(worldValues.alignmentStrength),
-    );
-
-    // Add all directions up and normalise once at the end, so all have equal weighting
-    if (steering.magnitude() > 0) {
-      boid.direction = steering.add(boid.direction).normalised();
+    const speed = boid.velocity.magnitude();
+    console.log('speed: ' + speed);
+    if (speed > MAX_SPEED) {
+      boid.velocity = boid.velocity
+        .divideScalar(speed)
+        .multiplyScalar(MAX_SPEED);
+    } else if (speed < MIN_SPEED) {
+      boid.velocity = boid.velocity
+        .divideScalar(speed)
+        .multiplyScalar(MIN_SPEED);
     }
 
-    boid.velocity = boid.direction.multiplyScalar(boid.speed * deltaTime);
     boid.position = boid.position.add(boid.velocity);
   }
 }
@@ -76,7 +78,7 @@ function cohesion(boid: Boid) {
   // add all positions
   // dived by number of boids
   // move towards that position.
-  let center: Vector = new Vector(0, 0).add(boid.position);
+  let averagePos: Vector = new Vector(0, 0);
   let neighbours: number = 0;
 
   for (let index = 0; index < world.boids.length; index++) {
@@ -87,7 +89,7 @@ function cohesion(boid: Boid) {
     const distance = boid.position.distance(neighbour.position);
 
     if (distance <= worldValues.neighbourDistance) {
-      center = center.add(neighbour.position);
+      averagePos = averagePos.add(neighbour.position);
       neighbours++;
     }
   }
@@ -96,16 +98,19 @@ function cohesion(boid: Boid) {
     return new Vector(0, 0);
   }
 
-  center = center.divideScalar(neighbours);
-  const steering: Vector = center.subtract(boid.position).normalised();
+  averagePos = averagePos.divideScalar(neighbours);
+  const velocity: Vector = averagePos
+    .subtract(boid.position)
+    .multiplyScalar(worldValues.cohesionStrength);
 
-  return steering;
+  return velocity;
 }
 
 function separation(boid: Boid): Vector {
   // for the given boid, loop through the others to find the neighbours (if within x radius).
   // if closer than min distance, move away using a - b.
-  let steering: Vector = new Vector(0, 0);
+  let velocity: Vector = new Vector(0, 0);
+  let close: Vector = new Vector(0, 0);
 
   for (let index = 0; index < world.boids.length; index++) {
     const neighbour = world.boids[index];
@@ -114,19 +119,18 @@ function separation(boid: Boid): Vector {
     const distance = boid.position.distance(neighbour.position);
 
     if (distance <= worldValues.separationDistance) {
-      const away = boid.position.subtract(neighbour.position).normalised();
-
+      close = close.add(boid.position.subtract(neighbour.position));
       // weight by distance
       // TODO: This wieghting has a big effect. if removed, you'll see what I mean. This is causing separation to behave differently to
       //      the others. Either they should all be weighted or none should (currently leaning towards none for now. When you add weighting
       //      to all, if should also be a debug value for how strong it is).
       // const weight = 1 / distance;
       // steering = steering.add(away.multiplyScalar(weight));
-      steering = steering.add(away);
+      velocity = close.multiplyScalar(worldValues.boidAvoidanceStrength);
     }
   }
 
-  return steering;
+  return velocity;
 }
 
 function alignment(boid: Boid) {
@@ -134,7 +138,7 @@ function alignment(boid: Boid) {
   // divide by number of boids
   // get direction towards that point
 
-  let destination: Vector = new Vector(0, 0).add(boid.position);
+  let averageVelocity: Vector = new Vector(0, 0);
   let neighbours: number = 0;
 
   for (let index = 0; index < world.boids.length; index++) {
@@ -145,7 +149,7 @@ function alignment(boid: Boid) {
     const distance = boid.position.distance(neighbour.position);
 
     if (distance <= worldValues.neighbourDistance) {
-      destination = destination.add(neighbour.direction);
+      averageVelocity = averageVelocity.add(neighbour.velocity);
       neighbours++;
     }
   }
@@ -154,42 +158,41 @@ function alignment(boid: Boid) {
     return new Vector(0, 0);
   }
 
-  destination = destination.divideScalar(neighbours);
-  const steering: Vector = destination.subtract(boid.position).normalised();
+  averageVelocity = averageVelocity.divideScalar(neighbours);
+  const velocity: Vector = averageVelocity
+    .subtract(boid.velocity)
+    .multiplyScalar(worldValues.alignmentStrength);
 
-  return steering;
+  return velocity;
 }
 
 function borderAvoidance(boid: Boid): Vector {
   const bounds = world.bounds;
   const margin = worldValues.borderMargin;
-  let steering = new Vector(0, 0);
+  // const steering = new Vector(0, 0);
+  let velocity = new Vector(0, 0);
 
   // Left wall
   if (boid.position.x < bounds.min.x + margin) {
-    const distance = bounds.min.x + margin - boid.position.x;
-    steering = steering.add(new Vector(distance / margin, 0));
+    velocity = velocity.add(new Vector(worldValues.turnFactor, 0));
   }
 
   // Right wall
   if (boid.position.x > bounds.max.x - margin) {
-    const distance = boid.position.x - (bounds.max.x - margin);
-    steering = steering.subtract(new Vector(distance / margin, 0));
+    velocity = velocity.subtract(new Vector(worldValues.turnFactor, 0));
   }
 
   // Top wall
   if (boid.position.y < bounds.min.y + margin) {
-    const distance = bounds.min.y + margin - boid.position.y;
-    steering = steering.add(new Vector(0, distance / margin));
+    velocity = velocity.add(new Vector(0, worldValues.turnFactor));
   }
 
   // Bottom wall
   if (boid.position.y > bounds.max.y - margin) {
-    const distance = boid.position.y - (bounds.max.y - margin);
-    steering = steering.subtract(new Vector(0, distance / margin));
+    velocity = velocity.subtract(new Vector(0, worldValues.turnFactor));
   }
 
-  return steering;
+  return velocity;
 }
 
 function setNeighbours(boid: Boid): void {
